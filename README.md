@@ -1,90 +1,62 @@
 import tkinter as tk
-from tkinter import messagebox
-import numpy as np
 
+# Function to update input field when button is clicked
+def button_click(number):
+    current = entry.get()
+    entry.delete(0, tk.END)
+    entry.insert(0, current + str(number))
+
+# Function to clear input
+def button_clear():
+    entry.delete(0, tk.END)
+
+# Function to evaluate the expression
+def button_equal():
+    try:
+        result = eval(entry.get())
+        entry.delete(0, tk.END)
+        entry.insert(0, str(result))
+    except:
+        entry.delete(0, tk.END)
+        entry.insert(0, "Error")
+
+# ---------------- GUI Setup ---------------- #
 root = tk.Tk()
-root.geometry("600x600")
-root.title("Temperature Converter using Tkinter")
+root.title("Calculator")
 
-#---main frame---
-main_frame = tk.Frame(root, pady=10, width=500, bg="light blue", height=500, border=50)
-main_frame.pack(pady=50)
-main_frame.pack_propagate(False)
+# Entry field
+entry = tk.Entry(root, width=20, borderwidth=10, font=("Arial", 18), justify="right")
+entry.grid(row=0, column=0, columnspan=4, pady=10)
 
-# --- label ---
-userlabel = tk.Label(main_frame, text="Temperature Fahrenheit to Celsius", 
-                  font=("Arial", 12, "bold"), bg="light blue", fg="black")
-userlabel.pack()
+# Number buttons
+buttons = [
+    ('7',1,0), ('8',1,1), ('9',1,2),
+    ('4',2,0), ('5',2,1), ('6',2,2),
+    ('1',3,0), ('2',3,1), ('3',3,2),
+    ('0',4,1)
+]
 
-# --- input frame ---
-input_frame = tk.Frame(main_frame)
-input_frame.pack(pady=20)
+for (text,row,col) in buttons:
+    button = tk.Button(root, text=text, padx=20, pady=20, font=("Arial", 24),
+                       command=lambda t=text: button_click(t))
+    button.grid(row=row, column=col)
 
-input_box = tk.Entry(input_frame, width=10)
-input_box.grid(row=0, column=0)
+# Operator buttons
+operators = [
+    ('+',1,3), ('-',2,3), ('*',3,3), ('/',4,3)
+]
 
-# --- answer entry ---
-answer = tk.Entry(main_frame, state="readonly", width=11)
-answer.pack(pady=10)
+for (op,row,col) in operators:
+    button = tk.Button(root, text=op, padx=20, pady=20, font=("Arial", 24),
+                       command=lambda t=op: button_click(t))
+    button.grid(row=row, column=col)
 
-stack = []
+# Clear button
+clear_button = tk.Button(root, text="C", padx=20, pady=20, font=("arial", 24), command=button_clear)
+clear_button.grid(row=4, column=0)
 
-# --- functions ---
-def change_temp():
- user = input_box.get().strip()
- if user == "":
-     messagebox.showinfo("Error", "Please enter a number")
-     return
- 
- if user.replace(".", "", 1).isdigit():  # allows float numbers
-     value = float(user)
-     formula = np.round((value - 32) * 5 / 9, 2)
-     
-     answer.config(state="normal")
-     answer.delete(0, tk.END)
-     answer.insert(0, formula)
-     answer.config(state="readonly")
- else:
-     messagebox.showinfo("Wrong", "Enter only numbers")
-
-def clear():
- answer_value = answer.get()
- if answer_value:
-     stack.append(answer_value)
-     print("Stack:", stack)
-
- input_value = input_box.get()
- if input_value:
-     stack.append(input_value)
-     print("Stack:", stack)
-
- answer.config(state="normal")
- answer.delete(0, tk.END)
- answer.config(state="readonly")
- input_box.delete(0, tk.END)
-
-def undo_data():
- if len(stack) >= 2:
-     d = stack[-1]   # input value
-     s = stack[-2]   # answer value
-
-     input_box.insert(0, d)
-     answer.config(state="normal")
-     answer.insert(0, s)
-     answer.config(state="readonly")
-
-# --- buttons ---
-convert_button = tk.Button(main_frame, text="Convert", 
-                        font=("Arial", 12, "bold"), width=10, 
-                        bg="#34495e", fg="white", command=change_temp)
-convert_button.pack(pady=30)
-
-delete = tk.Button(main_frame, text="Clear", command=clear, 
-                font=("Arial", 12, "bold"), width=10, bg="#34495e", fg="white")
-delete.pack()
-
-undo = tk.Button(main_frame, text="Undo", width=10, 
-              font=("Arial", 12, "bold"), command=undo_data)
-undo.pack(pady=30)
+# Equal button
+equal_button = tk.Button(root, text="=", padx=20, pady=20, font=("arial", 24), command=button_equal)
+equal_button.grid(row=4, column=2)
 
 root.mainloop()
